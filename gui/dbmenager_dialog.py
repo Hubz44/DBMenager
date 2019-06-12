@@ -37,6 +37,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 class DBMenagerDialog(QtWidgets.QDialog, FORM_CLASS):
 
     db = None
+    login = False
 
     def __init__(self, parent, parents=None):
         """Constructor."""
@@ -55,6 +56,7 @@ class DBMenagerDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def connectToDatabase(self):
         
+        self.login = True 
         name = self.dbName.displayText()
         host = self.dbHost.displayText()
         port = self.dbPort.displayText()
