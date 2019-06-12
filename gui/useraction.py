@@ -58,6 +58,7 @@ class DBUserAction(QtWidgets.QDialog, FORM_CLASS):
 
     def action(self, actionType):
 
+        self.privilages = []
         for cb in self.findChildren(QtWidgets.QCheckBox):
             if cb.isChecked() and cb.text() not in self.privilages:
                 self.privilages.append(cb.text())
@@ -82,6 +83,7 @@ class DBUserAction(QtWidgets.QDialog, FORM_CLASS):
                 )
         elif self.parent.actionType == 'alterUser' and self.parent.usersTable.selectedItems():
             selectedUser = self.parent.usersTable.selectedItems()[0].text()
+            print(selectedUser, strPrivilages)
             
             query = QSqlQuery(self.parent.db)
             query.exec_(
