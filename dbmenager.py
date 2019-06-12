@@ -76,6 +76,7 @@ class DBMenager:
         self.pluginIsActive = False
         self.dockwidget = None
         self.dialog = None
+        self.first_start = None
 
 
     # noinspection PyMethodMayBeStatic
@@ -171,6 +172,8 @@ class DBMenager:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
+        self.first_start    = True
+        print(self.first_start)
         icon_path = ':/plugins/dbmenager/icon.png'
         self.add_action(
             icon_path,
@@ -216,22 +219,26 @@ class DBMenager:
         """Run method that loads and starts the plugin"""
 
         if not self.pluginIsActive:
-            self.pluginIsActive = True
-
-
             self.dialog = DBMenagerDialog(self)
-            self.dialog.show()
+            self.dialog.exec()
+            print(self.dockwidget)
+        
+        if self.dialog.login and self.dockwidget is None:
+            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
     def showDock(self):
 
-        if self.dialog.db.isOpen():
-            if self.dockwidget == None:
+         if not self.pluginIsActive:
+            self.pluginIsActive = True
 
-                self.dockwidget = DBMenagerDockWidget(self.iface, self.dialog.db)
+            if self.dialog.db.isOpen():
+                if self.dockwidget == None:
 
-            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+                    self.dockwidget = DBMenagerDockWidget(self.iface, self.dialog.db)
 
-            self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
-            self.dockwidget.fillUsersTable(self.dockwidget.tablesComboBox.currentText())
-            
-            self.dockwidget.show()
+                self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+
+                self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
+                self.dockwidget.fillUsersTable(self.dockwidget.tablesComboBox.currentText())
+                
+                self.dockwidget.show()
