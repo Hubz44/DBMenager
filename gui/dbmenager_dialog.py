@@ -59,7 +59,7 @@ class DBMenagerDialog(QtWidgets.QDialog, FORM_CLASS):
         host = self.dbHost.displayText()
         port = self.dbPort.displayText()
         user = self.dbUser.displayText()
-        password = self.dbPassword.displayText()
+        password = self.dbPassword.text()
 
         if self.SysComboBox.currentText() == 'PostgreSQL':
             self.db = QSqlDatabase.addDatabase('QPSQL')
@@ -72,8 +72,6 @@ class DBMenagerDialog(QtWidgets.QDialog, FORM_CLASS):
         self.db.setUserName(user)
         self.db.setPassword(password)
         self.db.open()
-
-        print(self.db.isOpen())
 
         if self.db.isOpen():
             QtWidgets.QMessageBox.information(None, 'Access granted', f'You have successfully login to {name}')
