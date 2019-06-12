@@ -24,7 +24,7 @@
 
 import os
 
-from PyQt5 import QtGui, QtWidgets, uic
+from PyQt5 import QtGui, QtWidgets, Qt, uic
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtSql import QSqlQuery
 
@@ -49,14 +49,17 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # http://doc.qt.io/qt-5/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         
+        self.userAndPrivilages = {}
         self.userDialog = None
         self.actonType = None
-        self.iface = iface 
+        self.iface = iface
         self.db = database
         self.setupUi(self)
 
         self.logOutBttn.clicked.connect(self.closeConnection)
         self.addUserBttn.clicked.connect(self.addUser)
+        self.removeUserBttn.clicked.connect(self.removeUser)
+        self.editUserBttn.clicked.connect(self.alterUser)
         
         self.tablesComboBox.addItems(self.db.tables())
         self.tablesComboBox.currentTextChanged.connect(self.fillUsersTable)
@@ -95,16 +98,20 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         
         for idx, user in enumerate(users):
             privilages = ''
+            privList = []
             privilageQuery.exec_(
                 f"""SELECT grantee, privilege_type as "privilage"
-                FROM information_schema.role_table_grants 
-                where table_name = '{table}' and grantee = '{user}' """
+                    FROM information_schema.role_table_grants 
+                    where table_name = '{table}' and grantee = '{user}' """
             )
 
             while privilageQuery.next():
                 record = privilageQuery.record()
                 privilage = str(record.value('privilage'))
                 privilages += f'{privilage[0]} '
+                privList.append(privilage)
+            
+            self.userAndPrivilages[f'{user}'] = privList
             
             print(privilages)
             self.usersTable.setItem(idx, 0, QtWidgets.QTableWidgetItem(user))
@@ -112,7 +119,38 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     def addUser(self):
         
-        self.actionType = 'addUser'
+        self.actionType = 'createUser'
         self.userDialog = DBUserAction(self)
         self.userDialog.show()
+
+
+    def alterUser(self):
+
+        if self.usersTable.selectedItems():
+            self.actionType = 'alterUser'
+            selectedUser = self.usersTable.selectedItems()[0].text()
+            self.userDialog = DBUserAction(self)
+            self.userDialog.usernameIn.setText(selectedUser)
+            
+            for cb in self.userDialog.findChildren(QtWidgets.QCheckBox):
+                if cb.text() in self.userAndPrivilages[f'{selectedUser}']:
+                    cb.setChecked(True)
+            
+            self.userDialog.show()
+       
+        
+    def removeUser(self):
+        
+        if self.usersTable.selectedItems():
+            selectedUser = self.usersTable.selectedItems()[0].text()
+            if self.db.userName() != selectedUser:
+                removeQuery = QSqlQuery(self.db)
+                removeQuery.exec_(
+                f"""REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM {selectedUser};
+                    DROP USER {selectedUser};"""
+            )
+            self.fillUsersTable(self.tablesComboBox.currentText())
+
+
+        
         

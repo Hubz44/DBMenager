@@ -64,25 +64,31 @@ class DBUserAction(QtWidgets.QDialog, FORM_CLASS):
 
         self.username = self.usernameIn.displayText()
         self.password = self.passwordIn.displayText()
+        table = self.parent.tablesComboBox.currentText()
 
-        if self.parent.actionType == 'addUser':
-            username = self.username
-            password = self.password
-            privilages = self.privilages
-            table = self.parent.tablesComboBox.currentText()
-            strPrivilages = ''
+        strPrivilages = ''
 
-            for idx, privilage in enumerate(privilages):
-                if idx < len(privilages)-1:
-                    strPrivilages += f'{privilage},'
-                else:
-                    strPrivilages += f'{privilage}'
+        for idx, privilage in enumerate(self.privilages):
+            if idx < len(self.privilages)-1:
+                strPrivilages += f'{privilage},'
+            else:
+                strPrivilages += f'{privilage}'
 
-
+        if self.parent.actionType == 'createUser':
             addUserQuery = QSqlQuery(self.parent.db)
             addUserQuery.exec_(
-            f"""CREATE USER {username} WITH PASSWORD '{password}';
-                GRANT {strPrivilages} ON {table} TO {username}"""
+            f"""CREATE USER {self.username} WITH PASSWORD '{self.password}';
+                GRANT {strPrivilages} ON {table} TO {self.username}"""
                 )
+        elif self.parent.actionType == 'alterUser' and self.parent.usersTable.selectedItems():
+            selectedUser = self.parent.usersTable.selectedItems()[0].text()
+            
+            query = QSqlQuery(self.parent.db)
+            query.exec_(
+            f"""REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM {selectedUser};
+                GRANT {strPrivilages} ON {table} TO {selectedUser}"""
+            )
+
+            
         self.parent.fillUsersTable(table)
         self.accept()

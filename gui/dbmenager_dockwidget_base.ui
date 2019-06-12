@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>643</width>
-    <height>200</height>
+    <width>350</width>
+    <height>418</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>208</width>
+    <height>418</height>
+   </size>
   </property>
   <property name="features">
    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
@@ -36,21 +42,21 @@
       <item>
        <widget class="QPushButton" name="addUserBttn">
         <property name="text">
-         <string>Add user</string>
+         <string>Create user</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="removeUserBttn">
         <property name="text">
-         <string>Remove user</string>
+         <string>Drop user</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="editUserBttn">
         <property name="text">
-         <string>Edit user</string>
+         <string>Alter user</string>
         </property>
        </widget>
       </item>
@@ -73,6 +79,12 @@
      <widget class="QTableWidget" name="usersTable">
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
       </property>
      </widget>
     </item>
