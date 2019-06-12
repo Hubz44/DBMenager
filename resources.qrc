@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/dbmenager" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
