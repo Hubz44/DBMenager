@@ -76,7 +76,6 @@ class DBMenager:
         self.pluginIsActive = False
         self.dockwidget = None
         self.dialog = None
-        self.first_start = None
 
 
     # noinspection PyMethodMayBeStatic
@@ -172,8 +171,6 @@ class DBMenager:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        self.first_start    = True
-        print(self.first_start)
         icon_path = ':/plugins/dbmenager/icon.png'
         self.add_action(
             icon_path,
