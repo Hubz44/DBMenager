@@ -64,8 +64,6 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.tablesComboBox.addItems(self.db.tables())
         self.tablesComboBox.currentTextChanged.connect(self.fillUsersTable)
     
-        
-
     def closeEvent(self, event):
         self.closingPlugin.emit()
         event.accept()
@@ -123,7 +121,6 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.userDialog = DBUserAction(self)
         self.userDialog.show()
 
-
     def alterUser(self):
 
         if self.usersTable.selectedItems():
@@ -137,11 +134,12 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                     cb.setChecked(True)
             
             self.userDialog.show()
-       
-        
+    
     def removeUser(self):
-        
-        if self.usersTable.selectedItems():
+
+        reply = QtWidgets.QMessageBox.question(self, 'Drop user', 'Do you want to drop user?')
+
+        if self.usersTable.selectedItems() and reply == QtWidgets.QMessageBox.Yes:
             selectedUser = self.usersTable.selectedItems()[0].text()
             if self.db.userName() != selectedUser:
                 removeQuery = QSqlQuery(self.db)

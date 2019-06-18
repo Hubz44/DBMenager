@@ -86,11 +86,16 @@ class DBUserAction(QtWidgets.QDialog, FORM_CLASS):
             print(selectedUser, strPrivilages)
             
             query = QSqlQuery(self.parent.db)
-            query.exec_(
-            f"""REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM {selectedUser};
-                GRANT {strPrivilages} ON {table} TO {selectedUser}"""
-            )
 
+            if self.privilages:
+                query.exec_(
+                f"""REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM {selectedUser};
+                    GRANT {strPrivilages} ON {table} TO {selectedUser}"""
+                )
+            else:
+                 query.exec_(
+                f"""REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM {selectedUser}"""
+                )
             
         self.parent.fillUsersTable(table)
         self.accept()

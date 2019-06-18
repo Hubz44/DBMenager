@@ -33,7 +33,6 @@ import os
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dbmenager_dialog_base.ui'))
 
-
 class DBMenagerDialog(QtWidgets.QDialog, FORM_CLASS):
 
     db = None
