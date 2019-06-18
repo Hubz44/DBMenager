@@ -224,8 +224,8 @@ class DBMenager:
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
     def showDock(self):
-
-         if not self.pluginIsActive:
+        """Method that loads dockwidget after logging in"""
+        if not self.pluginIsActive:
             self.pluginIsActive = True
 
             if self.dialog.db.isOpen():
