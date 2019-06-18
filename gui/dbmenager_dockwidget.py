@@ -69,14 +69,16 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         event.accept()
 
     def closeConnection(self):
+        """ Closing db conection and dockwidget when pressed logout """
         self.db.close()
         self.close()
 
-    def fillUsersTable(self, text):
-
-        table = text
+    def fillUsersTable(self, table):
+        """ Method that is filling in all users and theirs privilages on current table in database """
+        table = table
         users = []
         
+        #Get all users
         userQuery = QSqlQuery(self.db)
         userQuery.exec_(
             """SELECT u.usename as "Username"
@@ -92,8 +94,8 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.usersTable.setColumnCount(2)
         self.usersTable.setHorizontalHeaderLabels(['Users', 'Privilages'])
 
+        #Get users privilages on current table
         privilageQuery = QSqlQuery(self.db)
-        
         for idx, user in enumerate(users):
             privilages = ''
             privList = []
@@ -103,26 +105,30 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                     where table_name = '{table}' and grantee = '{user}' """
             )
 
+            #Alter privilages string to first letters only
             while privilageQuery.next():
                 record = privilageQuery.record()
                 privilage = str(record.value('privilage'))
                 privilages += f'{privilage[0]} '
                 privList.append(privilage)
-            
+            #Save reference to users and their privilages in dict
             self.userAndPrivilages[f'{user}'] = privList
             
-            print(privilages)
+            # print(privilages)
             self.usersTable.setItem(idx, 0, QtWidgets.QTableWidgetItem(user))
             self.usersTable.setItem(idx, 1, QtWidgets.QTableWidgetItem(privilages))
 
     def addUser(self):
+        """ Method that opens user action dialog to create new user (creating user happens when 
+        in user action dialog 'Accept' is pressed)"""
         
         self.actionType = 'createUser'
         self.userDialog = DBUserAction(self)
         self.userDialog.show()
 
     def alterUser(self):
-
+        """ Method that checks all selected user privilages in checkbox, fills username field
+        and opens user action dialog with action type 'alterUser' """
         if self.usersTable.selectedItems():
             self.actionType = 'alterUser'
             selectedUser = self.usersTable.selectedItems()[0].text()
@@ -136,7 +142,7 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             self.userDialog.show()
     
     def removeUser(self):
-
+        """ Method that removes user from database """
         reply = QtWidgets.QMessageBox.question(self, 'Drop user', 'Do you want to drop user?')
 
         if self.usersTable.selectedItems() and reply == QtWidgets.QMessageBox.Yes:
@@ -147,6 +153,7 @@ class DBMenagerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                 f"""REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM {selectedUser};
                     DROP USER {selectedUser};"""
             )
+            #Refresh table
             self.fillUsersTable(self.tablesComboBox.currentText())
 
 

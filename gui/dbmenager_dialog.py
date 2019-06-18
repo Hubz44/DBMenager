@@ -50,11 +50,11 @@ class DBMenagerDialog(QtWidgets.QDialog, FORM_CLASS):
         self.parent = parent
         self.setupUi(self)
 
-        self.SysComboBox.addItems(['PostgreSQL', 'MySQL'])
+        self.SysComboBox.addItems(['PostgreSQL'])
         self.loginButton.clicked.connect(self.connectToDatabase)
 
     def connectToDatabase(self):
-        
+        """ Connect to database and save connection info if logged in """
         self.login = True 
         name = self.dbName.displayText()
         host = self.dbHost.displayText()
@@ -62,10 +62,9 @@ class DBMenagerDialog(QtWidgets.QDialog, FORM_CLASS):
         user = self.dbUser.displayText()
         password = self.dbPassword.text()
 
+        #TODO ADD OTHER DB SYSTEMS 
         if self.SysComboBox.currentText() == 'PostgreSQL':
             self.db = QSqlDatabase.addDatabase('QPSQL')
-        else:
-            self.db = QSqlDatabase.addDatabase('MySQL')
 
         self.db.setDatabaseName(name)
         self.db.setHostName(host)
@@ -74,6 +73,7 @@ class DBMenagerDialog(QtWidgets.QDialog, FORM_CLASS):
         self.db.setPassword(password)
         self.db.open()
 
+        #TODO CHECK IF USER CAN CREATE ROLES AND USERS
         if self.db.isOpen():
             QtWidgets.QMessageBox.information(None, 'Access granted', f'You have successfully login to {name}')
             self.close()
